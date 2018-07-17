@@ -1,0 +1,15 @@
+{
+  "name": "phbot",
+  "version": "1.0.0",
+  "description": "A bot for Place_Holder",
+  "main": "app.js",
+  "dependencies": {
+    "discord.js": "^11.3.2"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "!ph"
+  },
+  "author": "Jayden",
+  "license": "ISC"
+}
