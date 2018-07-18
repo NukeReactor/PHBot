@@ -9,15 +9,17 @@ const { prefix, token } = require('./config.json');
 
 const talkedRecently = new Set();
 
-var version = "1.0.1";
+var version = "1.1.0";
 
 var usage = 0;
 
-var timeLeft;
+var time, timer, timeLeft;
 
 var upsec = 0;
 var upmin = 0;
 var uphour = 0;
+
+var cmdTotal = 46;
 
 update();
 
@@ -50,43 +52,43 @@ client.on("message", message => {
     
     switch(cmd) { 
       case 'help' : 
-        usage += 1;
+        usage++;
         message.author.send(help());
       break;
 
       case 'yo': 
-        usage += 1;
+        usage++;
         message.channel.send("sup");
       break;
 
       case 'cool' : 
-        usage += 1;
+        usage++;
         message.channel.send(`<@${message.author.id}> is the coolest`);
       break;
 
       case 'say' :
-        usage += 1;
+        usage++;
         mArray.shift();
         message.channel.send(mArray.join(" "));
       break;
 
       case 'agree' : 
-        usage += 1;
+        usage++;
         message.channel.send(`I personally agree with <@${message.author.id}>`);
       break;
 
       case 'server-info' : 
-        usage += 1;
+        usage++;
         message.channel.send(`Server: ${message.guild.name}\nTotal Members: ${message.guild.memberCount}\nCreated At: ${message.guild.createdAt}\nRegion: ${message.guild.region}`);
       break;
 
       case 'user-info' : 
-        usage += 1;
+        usage++;
         message.channel.send(`Username: ${message.author.username}\nID: ${message.author.id}\nDate Created: ${message.author.createdAt}`);
       break;
 
       case 'fruit' : 
-        usage += 1;
+        usage++;
         message.channel.send('🍎')
           .then(() => message.channel.send('🍊'))
           .then(() => message.channel.send('🍇'))
@@ -94,7 +96,7 @@ client.on("message", message => {
       break;
 
       case 'rfruit' : 
-        usage += 1;
+        usage++;
         message.react('🍎')
           .then(() => message.react('🍊'))
           .then(() => message.react('🍇'))
@@ -102,7 +104,7 @@ client.on("message", message => {
       break;
 
       case 'roll' : 
-        usage += 1;
+        usage++;
         let num = Math.floor(Math.random() * 20) + 1;
         message.channel.send(`<@${message.author.id}> rolled a` + num);
       break;
@@ -112,7 +114,7 @@ client.on("message", message => {
       //Fix LOL, JOY, and WEEN
 
       case 'lol' :
-        usage += 1;
+        usage++;
         let [mojiCount1] = args; 
 
         if(mojiCount1 === null || mojiCount1 === undefined) {
@@ -123,12 +125,12 @@ client.on("message", message => {
       break;
 
       case 'rlol' : 
-        usage += 1;
+        usage++;
         message.react("😂");
       break;
 
       case 'joy' :
-        usage += 1;
+        usage++;
         let [mojiCount2] = args; 
 
         if(mojiCount2 === null || mojiCount2 === undefined) {
@@ -139,12 +141,12 @@ client.on("message", message => {
       break;
 
       case 'rjoy' : 
-        usage += 1;
+        usage++;
         message.react("😄");
       break;
 
       case 'ween' :
-        usage += 1;
+        usage++;
         let [mojiCount3] = args; 
 
         if(mojiCount3 === null || mojiCount3 === undefined) {
@@ -155,17 +157,17 @@ client.on("message", message => {
       break;
 
       case 'rween' : 
-        usage += 1;
+        usage++;
         message.react("🍆");
       break;
 
       case 'bot-info' : 
-        usage += 1;
-        message.channel.send(`Bot is in ${client.guilds.size} server(s)\nTotal members: ${client.users.size}\nTotal Channels: ${client.channels.size}\nVersion: ${version}`);
+        usage++;
+        message.channel.send(`Bot is in ${client.guilds.size} server(s)\nTotal members: ${client.users.size}\nTotal Channels: ${client.channels.size}\nTotal Commands: ${cmdTotal}\nGender: Female\nFavorite Food: Beans (see command "!ph beans")\nVersion: ${version}`);
       break;
 
       case 'success' : 
-        usage += 1;
+        usage++;
         let successNum = Math.floor(Math.random() * 4) + 1;
         if (successNum === 1) {
           message.channel.send("Hell yeah! That was amazing!");
@@ -183,44 +185,50 @@ client.on("message", message => {
       break;
 
       case 'PEACE' : 
-        usage += 1;
+        usage++;
         message.channel.send("REMAIN CALM. KEEP PEACE!");
       break;
 
       case 'peace' : 
-        usage += 1;
+        usage++;
         message.channel.send("Remain calm. Keep peace!");
       break;
 
       case 'destruction' : 
-        usage += 1;
+        usage++;
         message.channel.send("You, my good sir, have been **DESTROYED!**")
       break;
 
       case 'roasted' : 
-
+        usage++;
         message.channel.send("You, my good sir, have been **ROASTED!**")
       break;
 
-      case 'commandCount' : 
-        usage += 1;
-        message.channel.send("Their are currently 42 commands counting this one. Use !ph help for a full list");
-      break;
-
       case 'asl' : 
-        usage += 1;
+        usage++;
         let [age, sex, location] = args;
-        message.reply(`Hello ${message.author.username}, I see you're a ${age} year old ${sex} from ${location}. Wanna date?`);
+
+        if(args[0] === undefined || args[1] === undefined || args[2] === undefined) {
+          message.channel.send("Please input the correct parameters to use this command");
+        } else {
+          message.reply(`Hello ${message.author.username}, I see you're a ${age} year old ${sex} from ${location}. Wanna date?`); 
+        }    
       break;
 
       case 'shout' : 
-        usage += 1;
-        let member = message.mentions.members.first();
-        message.channel.send(`You there ${member} ?`);
+        usage++;
+        let [member] = args;
+        args[0] = message.mentions.members.first();
+
+        if(args[0] === undefined) {
+          message.channel.send("Please input an @mention to a user!");
+        } else {
+          message.channel.send(`You there ${member} ?`);
+        }
       break;
 
       case 'lizzie' : 
-        usage += 1;
+        usage++;
         let randNum = Math.floor(Math.random() * 10) + 1;
         if(randNum <= 2) {
           message.channel.send("Lizzie is in the living room");
@@ -238,109 +246,118 @@ client.on("message", message => {
       break;
 
       case 'dateChance': 
-        usage += 1;
+        usage++;
         let [date1, date2] = args;
-        args[0] = message.mentions.members;
-        args[1] = message.mentions.members;
-        let dateNum = Math.floor(Math.random() * 3) + 1;
+        args[0] = message.mentions.members.first();
+        args[1] = message.mentions.members.first();
+        let dateNum = Math.floor(Math.random() * 10) + 1;
 
-        if(dateNum === 1) {
-          message.channel.send(`${date1} and ${date2} are totally compatible!`);
+        if(args[0] === undefined || args[1] === undefined) {
+          message.channel.send("Please input an @mention to a user!");
         } else {
-          message.channel.send(`${date1} and ${date2} are not compatible together`);
+            if(dateNum <= 5) {
+              message.channel.send(`${date1} and ${date2} are totally compatible!`);
+        }   else if (dateNum <= 10) {
+             message.channel.send(`${date1} and ${date2} are not compatible together`);
+            }
         }
       break;
 
       case 'no-homo' : 
-       usage += 1;
+       usage++;
        message.channel.send(`<@${message.author.id}> said no homo! All gay is gone!`);
       break;
 
       case 'love-you' :
-        usage += 1;
+        usage++;
         let [lover] = args;
         args[0] = message.mentions.members.first();
-        message.channel.send(`<@${message.author.id}> loves you, ${lover}`);
-        setTimeout(function() {
-          message.channel.send("!ph no-homo");
-        }, 2500)
+
+        if(args[0] === undefined) {
+          message.channel.send("Please input an @mention to a user!");
+        } else {
+          message.channel.send(`<@${message.author.id}> loves you, ${lover}`);
+
+          setTimeout(function() {
+            message.channel.send("!ph no-homo");
+          }, 2500);
+        }
       break;
 
-      /*FIX THIS*/
-
       case 'brb' : 
-        usage += 1;
-        let [timeGone, activity] = args;
-
-        timeLeft = timeGone * 60000;
+        usage++;
+        let [time, activity] = args;
+        timeLeft = time * 60000;
 
         activity = args.slice(1).join(" ");
 
-        message.channel.send(`<@${message.author.id}> will be back in about ${timeGone} minutes to ${activity}`);
+        message.channel.send(`<@${message.author.id}> will be back in about ${time} minutes to ${activity}`);
     
-        var timer = setTimeout(function() {
+        timer = setTimeout(function() {
           message.channel.send(`<@${message.author.id}> should be back by now. Maybe`);
         }, timeLeft);
       break;
 
       case 'back' :
-        usage += 1;
-        timeLeft = 0;
-        message.channel.send(`<@${message.author.id}> is back earlier than expected!`);
+        usage++;
         clearTimeout(timer);
+        message.channel.send(`<@${message.author.id}> is back before they expected to be.`);
       break;
 
-      /*FIX THIS*/
-
       case 'woah' :
-        usage += 1;
+        usage++;
         message.channel.send("HOLY COW!");
       break;
 
       case 'used' : 
-        usage += 1;
+        usage++;
         message.channel.send(`The bot has been used ${usage} times since the last time it rejoined`);
       break;
 
       case 'succ' : 
-        usage += 1;
+        usage++;
         message.channel.send("***s   u   c   c***");
       break;
 
       case 'congrats' : 
-        usage += 1;
+        usage++;
         message.channel.send("https://youtu.be/1Bix44C1EzY");
       break;
 
       case 'alert' : 
-        usage += 1;
+        usage++;
         let [alert] = args;
         args[0] = message.mentions.members.first();
-        message.channel.send(`HEY ${alert} ARE YOU THERE!?`);
+
+        if(args[0] === undefined) {
+          message.channel.send("Please input an @mention to a user!");
+        } else {
+          message.channel.send(`HEY ${alert} ARE YOU THERE!?`);
+        }
       break;
 
       case 'nice' :
-        usage += 1;
+        usage++;
         message.channel.send("Extremely NICE MAN");
       break;
 
       case 'netter' : 
-        usage += 1;
+        usage++;
         message.channel.send("Netter Mann");
       break;
 
       case 'ok' : 
-        usage += 1;
+        usage++;
         message.channel.send("alright");
       break;
 
       case 'alright' :
-        usage += 1;
+        usage++;
         message.channel.send("ok");
       break;
 
       case 'yesno' :
-        usage += 1;
+        usage++;
         let yesnoNum = Math.floor(Math.random() * 2) + 1;
         if(yesnoNum === 1) {
           message.channel.send("yes");
@@ -350,19 +367,18 @@ client.on("message", message => {
       break;
 
       case 'uptime' :
-        usage += 1;
+        usage++;
         message.channel.send(`The bot has been online for ${uphour} hours, ${upmin} minutes, and ${upsec} seconds`);
       break;
 
       case 'spam' :
-        usage += 1;
+        usage++;
 
         mArray.shift();
 
         if (talkedRecently.has(message.author.id)) {
             message.channel.send("Wait 10 seconds before getting typing this again. - " + message.author);
         } else {
-
           for(let i = 0; i < 5; i++) {
             message.channel.send(`${mArray.join(" ")}`);
           }
@@ -374,8 +390,40 @@ client.on("message", message => {
         }
       break;
 
+      case 'sorry' :
+        usage++;
+        message.channel.send("I'm so sorry dude...");
+      break;
+
+      case 'oof' :
+        usage++;
+        message.channel.send("***O O F***");
+      break;
+
+      case 'umgl' : 
+        usage++;
+        let [victim] = args;
+        args[0] = message.mentions.members.first();
+
+        if(args[0] === undefined) {
+            message.channel.send("Please input an @mention to a user!");
+        } else {
+          message.channel.send(`Hey ${victim}, you're mom gay! LOL!`);
+        }
+      break;
+
+      case 'XD' :
+        usage++
+        message.channel.send("HA XD LOLOLOL")
+      break;
+
+      case 'beans' : 
+        usage++;
+        message.channel.send("This nigga eatin' *beans!?*");
+      break;
+
       default : 
-        usage += 1;
+        usage++;
         message.channel.send("Sorry but that isn't a command"); 
       break; 
      } 
@@ -423,25 +471,29 @@ function help() {
   21. PEACE - like peace, but LOUDER!!
   22. destruction - Let's somebody know they've been DESTROYED!
   23. roasted - lets somebody know they've been ROASTED
-  24. commandCount - tells how many commands their are at the moment
-  25. asl <age> <gender> <location> - Wanna date?
-  26. shout <@mention> - What's up?
-  27. lizzie - Tells where Lizzie the dog is
-  28. dateChance <@mention> <@mention> - Tells whether two people are compaitble or not.\n It's recommended to use the no homo command afterwords
-  29. no-homo - No homo dude. It's not gay now
-  30. love-you <@mention> - Tells them you love them. No homo tho
-  31. brb <amount-of-time-gone> <what-you-are-doing>- Tells how long you'll be gone to do something
-  32. used - Tells how many times the bot has ran commands
-  33. succ - s u c c
-  34. congrats - congratulaaaations!
-  35. alert <@mention> - Grabs somebody's attention
-  36. nice - Nice man
-  37. netter - Netter Mann
-  38. ok - alright
-  39. alright - ok
-  40. yesno - yes or no
-  41. uptime - Tell show long the bot has been online
-  42. spam <text> - spams. Be careful not to spam`;
+  24. asl <age> <gender> <location> - Wanna date?
+  25. shout <@mention> - What's up?
+  26. lizzie - Tells where Lizzie the dog is
+  27. dateChance <@mention> <@mention> - Tells whether two people are compaitble or not.\n It's recommended to use the no homo command afterwords
+  28. no-homo - No homo dude. It's not gay now
+  29. love-you <@mention> - Tells them you love them. No homo tho
+  30. brb <amount-of-time-gone> <what-you-are-doing>- Tells how long you'll be gone to do something
+  31. used - Tells how many times the bot has ran commands
+  32. succ - s u c c
+  33. congrats - congratulaaaations!
+  34. alert <@mention> - Grabs somebody's attention
+  35. nice - Nice man
+  36. netter - Netter Mann
+  37. ok - alright
+  38. alright - ok
+  39. yesno - yes or no
+  40. uptime - Tell show long the bot has been online
+  41. spam <text> - spams. Be careful not to spam
+  42. sorry - oof man, oof
+  43. oof - O O F
+  44. umgl <@mention> - UR MOM GAY LOL
+  45. XD - XD LOL HAHAHAHAHAHA
+  46. beans - This nigga eatin *beans*!?`;
 }
 
 client.login(token);
