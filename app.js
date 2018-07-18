@@ -7,9 +7,19 @@ const client = new Discord.Client();
 
 const { prefix, token } = require('./config.json');
 
+const talkedRecently = new Set();
+
 var version = "1.0.1";
 
 var usage = 0;
+
+var timeLeft;
+
+var upsec = 0;
+var upmin = 0;
+var uphour = 0;
+
+update();
 
 client.on("ready", () => {
   console.log(`Bot has started with ${client.users.size} users in ${client.channels.size} channels of ${client.guilds.size} guilds.`); 
@@ -96,6 +106,10 @@ client.on("message", message => {
         let num = Math.floor(Math.random() * 20) + 1;
         message.channel.send(`<@${message.author.id}> rolled a` + num);
       break;
+
+      //Make a custom roll
+
+      //Fix LOL, JOY, and WEEN
 
       case 'lol' :
         usage += 1;
@@ -190,7 +204,7 @@ client.on("message", message => {
 
       case 'commandCount' : 
         usage += 1;
-        message.channel.send("Their are currently 40 commands counting this one. Use !ph help for a full list");
+        message.channel.send("Their are currently 42 commands counting this one. Use !ph help for a full list");
       break;
 
       case 'asl' : 
@@ -256,9 +270,9 @@ client.on("message", message => {
 
       case 'brb' : 
         usage += 1;
-        let [timeGone, activity] = args
+        let [timeGone, activity] = args;
 
-        var timeLeft = timeGone * 60000;
+        timeLeft = timeGone * 60000;
 
         activity = args.slice(1).join(" ");
 
@@ -335,6 +349,31 @@ client.on("message", message => {
         }
       break;
 
+      case 'uptime' :
+        usage += 1;
+        message.channel.send(`The bot has been online for ${uphour} hours, ${upmin} minutes, and ${upsec} seconds`);
+      break;
+
+      case 'spam' :
+        usage += 1;
+
+        mArray.shift();
+
+        if (talkedRecently.has(message.author.id)) {
+            message.channel.send("Wait 10 seconds before getting typing this again. - " + message.author);
+        } else {
+
+          for(let i = 0; i < 5; i++) {
+            message.channel.send(`${mArray.join(" ")}`);
+          }
+
+          talkedRecently.add(message.author.id);
+          setTimeout(() => {
+            talkedRecently.delete(message.author.id);
+          }, 10000);
+        }
+      break;
+
       default : 
         usage += 1;
         message.channel.send("Sorry but that isn't a command"); 
@@ -342,6 +381,21 @@ client.on("message", message => {
      } 
    } 
  });
+
+function update() {
+ setInterval(function() {
+  upsec += 1;
+  if(upsec >= 60) {
+    upsec = 0;
+    upmin += 1;
+  }
+
+  if(upmin >= 60) {
+    upmin = 0;
+    uphour += 1;
+  }
+ }, 1000)
+}
 
 function help() {
   return `
@@ -385,7 +439,9 @@ function help() {
   37. netter - Netter Mann
   38. ok - alright
   39. alright - ok
-  40. yesno - yes or no`;
+  40. yesno - yes or no
+  41. uptime - Tell show long the bot has been online
+  42. spam <text> - spams. Be careful not to spam`;
 }
 
 client.login(token);
