@@ -19,7 +19,7 @@ var upsec = 0;
 var upmin = 0;
 var uphour = 0;
 
-var cmdTotal = 58;
+var cmdTotal = 61;
 
 update();
 
@@ -402,19 +402,31 @@ client.on("message", message => {
       case 'spam' :
         usage++;
 
-        mArray.shift();
+        let [spamCount, spamContent] = args;
+        args[1] = args.slice(1).join(" ");
+
+        var i = 0;
 
         if (talkedRecently.has(message.author.id)) {
-            message.channel.send("Wait 10 seconds before getting typing this again. - " + message.author);
+            message.channel.send("Wait 10 seconds before getting typing this again " + message.author);
         } else { 
-          for(let i = 0; i < 5; i++) {
-            message.channel.send(`${mArray.join(" ")}`);
-           }
+          if(spamCount > 10 || spamCount === undefined || spamCount <= 0 || spamCount === null) {
+            message.channel.send("Please input a valid number (1 - 10)");
+          } else {
+            if(args[1] === undefined || args[1] <= 1) {
+              message.channel.send("Please enter text to spam");
+            } else {
+                while(i < spamCount) {
+                  message.channel.send(spamContent);
+                  i++;
+                }
 
-           talkedRecently.add(message.author.id);
-           setTimeout(() => {
-            talkedRecently.delete(message.author.id);
-           }, 10000);
+                talkedRecently.add(message.author.id);
+                  setTimeout(() => {
+                   talkedRecently.delete(message.author.id);
+                }, 10000);
+             }
+          }
         }
       break;
 
@@ -488,7 +500,7 @@ client.on("message", message => {
 
       case 'do' :
         usage++;
-        message.channel.send("Wow... The actually did it!");
+        message.channel.send("Wow... They actually did it!");
       break;
 
       case 'holy' :
@@ -501,7 +513,53 @@ client.on("message", message => {
         message.channel.send("https://youtu.be/E4K0jkxRPe0");
       break;
 
-      default : 
+      case 'name' :
+        usage++;
+        let [thing, thingName, thingLastname] = args;
+
+        if(args[0] === undefined || args[1] === undefined || args.length <= 1) {
+          message.channel.send("Please input valid parameters to use this command!");
+        } else {
+          message.channel.send(`${message.author.username} named their ${thing} ${thingName} ${thingLastname}`);
+        }
+      break;
+
+       case 'retard' :
+        usage++;
+        let [personRet] = args;
+        args[0] = message.mentions.members.first();
+
+        if(args[0] === undefined) {
+          message.channel.send("Please tag somebody to use this command");
+        } else {
+          message.channel.send(`${personRet} is a retard!`);
+        }
+      break;
+
+      case 'convert' :
+        usage++;
+        let [conv] = args;
+        args[0] = message.mentions.members.first();
+
+        let conversion = args.slice(1).join(" ");
+
+        if(args[0] === undefined || args[1] === undefined) {
+          message.channel.send("Please input valid parameters to use this command");
+        } else {
+          message.channel.send(`${conv} has been converted to ${conversion}`);
+        }
+      break;
+
+      case 'fo' :
+        usage++;
+
+        let [fOff] = args;
+        fOff = args.slice(0).join(" ");
+
+        message.channel.send(`Fuck off ${fOff}`);
+      break;
+
+       default : 
         usage++;
         message.channel.send("Sorry but that isn't a command"); 
       break; 
@@ -554,6 +612,7 @@ function help() {
   destruction - Let's somebody know they've been DESTROYED!
   leap - ASCEND
   yeet - YeEt
+  name <thing> <thing's name> <optional last name> - names a thing
 
   __End of Page 1 - do !ph help2 for more commands__`;
 }
@@ -579,7 +638,7 @@ function help2() {
   alright - ok
   yesno - yes or no
   uptime - Tell show long the bot has been online (restarts once bot restarts)
-  spam <text> - spams. Be careful not to spam
+  spam <amount (1 - 10> <text> - spams. Be careful not to spam
   sorry - oof man, oof
   oof - O O F
   umgl <@mention> - UR MOM GAY LOL
@@ -592,6 +651,9 @@ function help2() {
   do - they did...
   holy - good
   holyg - thats a holy game!
+  convert - Converts people
+  retard - Calls someone a retard
+  fo <message> - Fuck off
 
   __End of Page 2__`
 }
